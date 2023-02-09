@@ -1,3 +1,93 @@
+<script setup>
+const course = useCourse();
+const route = useRoute();
+
+definePageMeta({
+  middleware: [
+    function ({ params }, from) {
+      const course = useCourse();
+
+      const chapter = course.chapters.find(
+        (chapter) => chapter.slug === params.chapterSlug
+      );
+
+      const lesson = chapter.lessons.find(
+        (lesson) => lesson.slug === params.lessonSlug
+      );
+
+      if (!chapter) {
+        return abortNavigation(
+          createError({
+            statusCode: 404,
+            message: 'Chapter not found',
+          })
+        );
+      }
+
+      if (!lesson) {
+        return abortNavigation(
+          createError({
+            statusCode: 404,
+            message: 'Lesson not found',
+          })
+        );
+      }
+    },
+
+    'auth'
+  ],
+});
+
+const chapter = computed(() => {
+  return course.chapters.find(
+    (chapter) => chapter.slug === route.params.chapterSlug
+  );
+});
+
+const lesson = computed(() => {
+  return chapter.value.lessons.find(
+    (lesson) => lesson.slug === route.params.lessonSlug
+  );
+});
+
+const title = computed(() => {
+  return `${lesson.value.title} - ${course.title}`;
+});
+useHead({
+  title,
+});
+
+const progress = useLocalStorage('progress', []);
+
+const isLessonComplete = computed(() => {
+  if (!progress.value[chapter.value.number - 1]) {
+    return false;
+  }
+
+  if (
+    !progress.value[chapter.value.number - 1][
+    lesson.value.number - 1
+      ]
+  ) {
+    return false;
+  }
+
+  return progress.value[chapter.value.number - 1][
+  lesson.value.number - 1
+    ];
+});
+
+const toggleComplete = () => {
+  if (!progress.value[chapter.value.number - 1]) {
+    progress.value[chapter.value.number - 1] = [];
+  }
+
+  progress.value[chapter.value.number - 1][
+  lesson.value.number - 1
+    ] = !isLessonComplete.value;
+};
+</script>
+
 <template>
   <div>
     <p class="mt-0 uppercase font-bold text-slate-400 mb-1">
@@ -31,89 +121,3 @@
     />
   </div>
 </template>
-
-<script setup>
-const course = useCourse();
-const route = useRoute();
-
-definePageMeta({
-  middleware({ params }, from) {
-    const course = useCourse();
-
-    const chapter = course.chapters.find(
-      (chapter) => chapter.slug === params.chapterSlug
-    );
-
-    const lesson = chapter.lessons.find(
-      (lesson) => lesson.slug === params.lessonSlug
-    );
-
-    if (!chapter) {
-      return abortNavigation(
-        createError({
-          statusCode: 404,
-          message: 'Chapter not found',
-        })
-      );
-    }
-
-    if (!lesson) {
-      return abortNavigation(
-        createError({
-          statusCode: 404,
-          message: 'Lesson not found',
-        })
-      );
-    }
-  },
-});
-
-const chapter = computed(() => {
-  return course.chapters.find(
-    (chapter) => chapter.slug === route.params.chapterSlug
-  );
-});
-
-const lesson = computed(() => {
-  return chapter.value.lessons.find(
-    (lesson) => lesson.slug === route.params.lessonSlug
-  );
-});
-
-const title = computed(() => {
-  return `${lesson.value.title} - ${course.title}`;
-});
-useHead({
-  title,
-});
-
-const progress = useLocalStorage('progress', []);
-
-const isLessonComplete = computed(() => {
-  if (!progress.value[chapter.value.number - 1]) {
-    return false;
-  }
-
-  if (
-    !progress.value[chapter.value.number - 1][
-      lesson.value.number - 1
-    ]
-  ) {
-    return false;
-  }
-
-  return progress.value[chapter.value.number - 1][
-    lesson.value.number - 1
-  ];
-});
-
-const toggleComplete = () => {
-  if (!progress.value[chapter.value.number - 1]) {
-    progress.value[chapter.value.number - 1] = [];
-  }
-
-  progress.value[chapter.value.number - 1][
-    lesson.value.number - 1
-  ] = !isLessonComplete.value;
-};
-</script>
