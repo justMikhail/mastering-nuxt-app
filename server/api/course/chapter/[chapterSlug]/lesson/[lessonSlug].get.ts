@@ -8,8 +8,7 @@ import {
 
 course as Course;
 
-export default defineEventHandler(
-  (event): LessonWithPath => {
+export default defineEventHandler((event): LessonWithPath => {
     const { chapterSlug, lessonSlug } =
       event.context.params;
 
@@ -24,9 +23,7 @@ export default defineEventHandler(
       });
     }
 
-    const lesson: Maybe<Lesson> = chapter.lessons.find(
-      (lesson) => lesson.slug === lessonSlug
-    );
+    const lesson: Maybe<Lesson> = chapter.lessons.find((lesson) => lesson.slug === lessonSlug);
 
     if (!lesson) {
       throw createError({
