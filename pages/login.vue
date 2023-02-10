@@ -1,3 +1,31 @@
+<script setup lang="ts">
+const { title } = useCourse();
+const { query } = useRoute();
+const supabase = useSupabaseClient()
+const user = useSupabaseUser();
+
+watchEffect(async () => {
+  if (user.value) {
+    await navigateTo(query.redirectTo as string, {
+      replace: true,
+    });
+  }
+});
+
+const login = async () => {
+  const redirectTo = `${window.location.origin}${query.redirectTo}`;
+
+  const {} = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+    options: { redirectTo },
+  })
+
+  if (error) {
+    console.error(error)
+  }
+};
+</script>
+
 <template>
   <div class="prose w-full max-w-2xl h-9">
     <h1>Log in to {{ title }}</h1>
@@ -9,19 +37,3 @@
     </button>
   </div>
 </template>
-
-<script setup lang="ts">
-const { title } = useCourse();
-
-const supabase = useSupabaseClient()
-
-const login = async () => {
-  const {} = await supabase.auth.signInWithOAuth({
-    provider: 'github',
-  })
-
-  if (error) {
-    console.error(error)
-  }
-};
-</script>

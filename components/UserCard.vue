@@ -6,6 +6,7 @@
     <img
       class="rounded-full w-12 h-12 border-2 border-blue-400"
       :src="profile"
+      alt="Avatar"
     />
     <div class="text-right">
       <div class="font-medium">{{ name }}</div>
