@@ -11,10 +11,6 @@ definePageMeta({
         (chapter) => chapter.slug === params.chapterSlug
       );
 
-      const lesson = chapter.lessons.find(
-        (lesson) => lesson.slug === params.lessonSlug
-      );
-
       if (!chapter) {
         return abortNavigation(
           createError({
@@ -23,6 +19,10 @@ definePageMeta({
           })
         );
       }
+
+      const lesson = chapter.lessons.find(
+        (lesson) => lesson.slug === params.lessonSlug
+      );
 
       if (!lesson) {
         return abortNavigation(
