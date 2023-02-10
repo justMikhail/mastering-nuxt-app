@@ -1,29 +1,43 @@
-import course from "~/server/courseData";
+import course from '~/server/courseData';
+import {
+  Course,
+  Chapter,
+  Lesson,
+  LessonWithPath,
+} from '~/types/course';
 
-export default defineEventHandler((event) => {
-  const { chapterSlug, lessonSlug } = event.context.params;
+course as Course;
 
-  const chapter = course.chapters.find(
-    (chapter) => chapter.slug === chapterSlug
-  );
+export default defineEventHandler(
+  (event): LessonWithPath => {
+    const { chapterSlug, lessonSlug } =
+      event.context.params;
 
-  if (!chapter) {
-    throw createError({
+    const chapter: Maybe<Chapter> = course.chapters.find(
+      (chapter) => chapter.slug === chapterSlug
+    );
+
+    if (!chapter) {
+      throw createError({
         statusCode: 404,
         message: 'Chapter not found',
-      })
-  }
+      });
+    }
 
-  const lesson = chapter.lessons.find(
-    (lesson) => lesson.slug === lessonSlug
-  );
+    const lesson: Maybe<Lesson> = chapter.lessons.find(
+      (lesson) => lesson.slug === lessonSlug
+    );
 
-  if (!lesson) {
-    throw createError({
+    if (!lesson) {
+      throw createError({
         statusCode: 404,
         message: 'Lesson not found',
-      })
-  }
+      });
+    }
 
-  return lesson;
-});
+    return {
+      ...lesson,
+      path: `/course/chapter/${chapterSlug}/lesson/${lessonSlug}`,
+    };
+  }
+);
