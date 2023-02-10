@@ -12,9 +12,7 @@ export default defineEventHandler((event): LessonWithPath => {
     const { chapterSlug, lessonSlug } =
       event.context.params;
 
-    const chapter: Maybe<Chapter> = course.chapters.find(
-      (chapter) => chapter.slug === chapterSlug
-    );
+    const chapter: Maybe<Chapter> = course.chapters.find((chapter) => chapter.slug === chapterSlug);
 
     if (!chapter) {
       throw createError({
