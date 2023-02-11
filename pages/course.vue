@@ -1,3 +1,13 @@
+<script setup>
+const course = await useCourse();
+const firstLesson = await useFirstLesson();
+
+const resetError = async (error) => {
+  await navigateTo(firstLesson.path);
+  error.value = null;
+};
+</script>
+
 <template>
   <div>
     <div
@@ -5,7 +15,7 @@
     >
       <h1 class="text-3xl">
         <span class="font-medium">
-          <span class="font-bold">{{ title }}</span>
+          <span class="font-bold">{{ course.title }}</span>
         </span>
       </h1>
       <UserCard />
@@ -18,7 +28,7 @@
         <h3>Chapters</h3>
         <div
           class="space-y-1 mb-4 flex flex-col"
-          v-for="chapter in chapters"
+          v-for="chapter in course.chapters"
           :key="chapter.slug"
         >
           <h4>{{ chapter.title }}</h4>
@@ -64,14 +74,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-const { chapters, title } = useCourse();
-
-const resetError = async (error) => {
-  await navigateTo(
-    '/course/chapter/1-chapter-1/lesson/1-introduction-to-typescript-with-vue-js-3'
-  );
-  error.value = null;
-};
-</script>
